@@ -68,7 +68,7 @@ public class IsTeleOp extends LinearOpMode {
     private final int linSlideUpperBound = 1150;
     private final double linSlidePower = 1;
     private final double depositLowerBound = 0.94;
-    private final double depositUpperBound = 0.05;
+    private final double depositUpperBound = 0.19;
     private final int turretLowerBound = 0;
     private final int turretUpperBound = 100;
     private final double linearServoLowerBound = 0.1;
@@ -91,7 +91,7 @@ public class IsTeleOp extends LinearOpMode {
     private int linSlidePosition = 0;
     private final double[] depositPositions = { 0.0, 0.3, 1.0 };
     private int depositPosition = 0;
-    private final double[] linearServoPositions = { 0.0, 0.5, 1.0 };
+    private final double[] linearServoPositions = { 0.0, 0.5, 0.95 };
     private int linearServoPosition = 0;
     private final double[] frontArmDifference = {0 , 0.07, 0.14};
     private final double[] linSlideFactor = {1, 0.65, 0.35};

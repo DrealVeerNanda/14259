@@ -57,11 +57,12 @@ import org.firstinspires.ftc.teamcode.SleeveDetection;
 
 import java.util.Random;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import org.firstinspires.ftc.teamcode.driver.StandardDriver;
 
 
 
-@Autonomous(name = "😈")
-public class LeftSideAuton extends LinearOpMode {
+@Autonomous
+public class LeftSide1plus5 extends LinearOpMode {
     //Camera
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -94,6 +95,7 @@ public class LeftSideAuton extends LinearOpMode {
     private double rKp = 1.09;
     private double rKi = 0.85;
     private double rKd = 0.04;
+    private SampleMecanumDrive drive;
     public double ActualVoltage;
     public VoltageSensor voltageS;
     AprilTagDetection tagOfInterest = null;
@@ -171,9 +173,9 @@ public class LeftSideAuton extends LinearOpMode {
     private int clawPosition = 0;
     private double[] frontArmPositions = { 0.96, 0.0 };
     private int frontArmPosition = 0;
-    private double[] linSlidePositions = { 0.0, 0.7, 0.8};
+    private double[] linSlidePositions = { 0.0, 0.7, 0.87};
     private int linSlidePosition = 0;
-    private double[] depositPositions = { 0.0, 0.25, 0.95 };
+    private double[] depositPositions = { 0.0, 0.32, 0.95 };
     private int depositPosition = 0;
     private double[] linearServoPositions = { 0.4, 0.5, 1.0 };
     private int linearServoPosition = 0;
@@ -194,7 +196,13 @@ public class LeftSideAuton extends LinearOpMode {
     private double angle;
     boolean parked = false;
 
+    StandardDriver driver;
+    double x = 0.0;
+    double heading = 0.0;
 
+    private void initDriver() {
+        this.driver = new StandardDriver(hardwareMap);
+    }
 
 
 
@@ -285,6 +293,7 @@ public class LeftSideAuton extends LinearOpMode {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         this.imu.initialize(parameters);
+        this.drive = new SampleMecanumDrive(hardwareMap);
 
         telemetry.addData("Status", "Initialized Sensors");
         telemetry.update();
@@ -411,6 +420,7 @@ public class LeftSideAuton extends LinearOpMode {
         // Control Hub motors
         this.linSlide.update();
 
+
         // Control Hub servos
         this.deposit.update();
         this.linearServo.update();
@@ -419,7 +429,7 @@ public class LeftSideAuton extends LinearOpMode {
 
         // Expansion Hub motors
         this.turret.update();
-
+        if(!parked) this.driver.update();
         // Expansion Hub servos
         this.rightArm.update();
         this.leftArm.update();
@@ -437,7 +447,6 @@ public class LeftSideAuton extends LinearOpMode {
 
         // Meta update
         this.timeManager.update();
-
     }
     private void interact() {
         this.turret.getDcMotor().setPower(0.7 * (gamepad2.left_stick_x));
@@ -466,21 +475,22 @@ public class LeftSideAuton extends LinearOpMode {
         Pose2d StartPose = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(StartPose);
         Trajectory traj4 = drive.trajectoryBuilder(StartPose)
-                .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(52.5, 0, Math.toRadians(90)))
                 .build();
-        Trajectory traj5 = drive.trajectoryBuilder(traj4.end())
-                .lineToLinearHeading(new Pose2d(53,0, Math.toRadians(90)))
-                .build();
-        TrajectorySequence middlePark = drive.trajectorySequenceBuilder(traj5.end())
+        TrajectorySequence middlePark = drive.trajectorySequenceBuilder(traj4.end())
                 .back(5)
                 .build();
-        TrajectorySequence leftPark = drive.trajectorySequenceBuilder(traj5.end())
+        TrajectorySequence leftPark = drive.trajectorySequenceBuilder(traj4.end())
                 .forward(10)
                 .build();
-        TrajectorySequence rightPark = drive.trajectorySequenceBuilder(traj5.end())
+        TrajectorySequence rightPark = drive.trajectorySequenceBuilder(traj4.end())
                 .back(20)
                 .build();
+        TrajectorySequence turn = drive.trajectorySequenceBuilder(StartPose)
+                .turn(90)
+                .build();
         this.initAll();
+        this.initDriver();
         //voltageS = hardwareMap.get(VoltageSensor.class, "battery");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -530,18 +540,21 @@ public class LeftSideAuton extends LinearOpMode {
         while (opModeIsActive()) {
             this.displayStats();
             this.updateAll();
-            //frontArm.setPosition(0);
-
-            drive.followTrajectory(traj4);
-            drive.followTrajectory(traj5);
+            //this.heading = Math.PI / 2.0;
+            frontArm.setPosition(0);
+            sleep(100);
+            this.driver.setX(5);
+            for(int i = 0; i < 20; i++)updateAll();
             this.linearServo.setPosition(0.1);
             this.turret.setPosition(0.5);
-
-            frontArm.setPosition(1);
+            //for(int i = 0; i < 50; i++)updateAll();
+            //this.driver.setHeading(this.heading);
+            drive.followTrajectorySequence(turn);
+            frontArm.setPosition(0.8);
             updateAll();
-            sleep(5000);
+            sleep(2000);
             this.displayStats();
-            armPosition = 4;
+            armPosition = 3;
             linSlidePosition = 2;
             sleep(400);
             linSlideUp(5);
@@ -584,7 +597,6 @@ public class LeftSideAuton extends LinearOpMode {
             sleep(500);
             this.displayStats();
             sleep(50000);
-
         }
     }
 
