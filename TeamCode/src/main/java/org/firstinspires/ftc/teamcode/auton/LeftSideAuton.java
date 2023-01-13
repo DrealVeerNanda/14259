@@ -150,8 +150,8 @@ public class LeftSideAuton extends LinearOpMode {
     private int linSlideUpperBound = 1150;
     private int linSlideLowerBound = 0;
     private double linSlidePower = 1;
-    private final double depositLowerBound = 0.94;
-    private final double depositUpperBound = 0.05 ;
+    private final double depositLowerBound = 0.25;
+    private final double depositUpperBound = 0.72;
     private int turretLowerBound = 0;
     private int turretUpperBound = 5300;
     private double turretPower = 0.6;
@@ -466,10 +466,10 @@ public class LeftSideAuton extends LinearOpMode {
         Pose2d StartPose = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(StartPose);
         Trajectory traj4 = drive.trajectoryBuilder(StartPose)
-                .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(89)))
                 .build();
         Trajectory traj5 = drive.trajectoryBuilder(traj4.end())
-                .lineToLinearHeading(new Pose2d(53,0, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(53,0, Math.toRadians(89)))
                 .build();
         TrajectorySequence middlePark = drive.trajectorySequenceBuilder(traj5.end())
                 .back(5)
@@ -545,8 +545,7 @@ public class LeftSideAuton extends LinearOpMode {
             linSlidePosition = 2;
             sleep(400);
             linSlideUp(5);
-            sleep(400);
-            sleep(100);
+            sleep(500);
             preIntakeMode(5);
             dump();
             sleep(400);
@@ -645,9 +644,9 @@ public class LeftSideAuton extends LinearOpMode {
         if(linSlideHigh) linSlidePosition = 2;
         else linSlidePosition = 1;
         moveLinSlide();
-        sleep(100);
-        depositPosition = 1;
-        moveDeposit();
+        //sleep(100);
+        //depositPosition = 1;
+        //moveDeposit();
         if(linSlideHigh) preIntakeMode(i);
     }
     private void resetLinSlide(){
