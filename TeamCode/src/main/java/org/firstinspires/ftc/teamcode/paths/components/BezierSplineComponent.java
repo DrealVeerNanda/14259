@@ -36,7 +36,7 @@ public class BezierSplineComponent implements Component {
       return Vec.normalize(Vec.add(Vec.sub(Vec.add(Vec.mul(a, v0), Vec.mul(b, v1)), Vec.mul(c, v2)), Vec.mul(d, v3)));
     }
   }
-
+  
   private static Vec[] getControlPoints(Vec[] points) throws Vec.DimMismatchException {
     int dim = points[0].getDim();
     int n = points.length - 1;
